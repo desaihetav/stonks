@@ -33,19 +33,24 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': databaseURL
 })
 
-def add_new_data(data_db):
+def create_db(data_db):
+    ref = db.reference('/')
+    ref.set(data_db)
+    
+def add_new_data(future_pred, symbol, stock_pred_id):
     ''' Function to add a new row of prediction to specific 
     document_id of specific stock_symbol
     '''
-    ref = db.reference('/')
-    ref.set(data_db)
+    ref = db.reference('stocks').child(symbol).child(stock_pred_id)
+    # ref.set(data_db) #  .
+    ref.push(future_pred)
 
 def update(stock_symbol, stock_pred_id, field, updated_value):
     ''' Function to update specific value of specific field of 
         specific document_id of specific stock_symbol
     '''
     ref = db.reference('stocks')
-    stock_ref = ref.child(stock_symbol).child(stock_pred_id)
+    stock_ref = ref.child(symbol).child(stock_pred_id)
     stock_ref.update({
     field : updated_value
 })
@@ -174,31 +179,36 @@ def main():
         
         newdf.loc[next_date, 'Close'] = pred_price
 
-    
-    newdf['Close'] = newdf['Close'].astype(int)
-    pd.to_numeric(newdf['Close'])
+    print(newdf.dtypes)
     print("Next {} day predictions are: {}".format(n, newdf[-(n * -1):]))
-    
-    # len_new_df = len(newdf['Close'])
-    # for i in range(len_new_df - n, len_new_df):
-    stock_pred_id = symbol + '_' + str(next_date.strftime('%d%m%Y'))   #'cipla_18032021' # (stock_symbol + _ + ddmmyy)
-    print("stock_red_id:", stock_pred_id)
-    data_db = {
-        'stocks': 
-        {
-            symbol:
-            {
-                stock_pred_id:
+    newdf2 = newdf[(n*-1):].Close.astype(int)
+    print("newdf2:", newdf2)
+    print("newdf2[1]:", newdf2[1])
+
+    for i in range(n):
+        last_date = date.today()
+        next_date = last_date + timedelta(days = i)
+        stock_pred_id = symbol + '_' + str(next_date.strftime('%d%m%Y'))   #'cipla_18032021' # (stock_symbol + _ + ddmmyy)
+        print("stock_pred_id:", stock_pred_id)
+
+        if i == 0:
+            data_db = {
+            'stocks': 
                 {
-                    'close': newdf['Close'][-1:],
-                    'prediction_for': next_date  # placeholder values for now
+                    symbol:
+                    {
+                        stock_pred_id:
+                        {
+                            'close': int(newdf2[0]),
+                        }
+                    }
                 }
             }
-        }
-    }
-    add_new_data(data_db)
+            create_db(data_db)
+        else:
+            add_new_data(int(newdf2[i]), symbol, stock_pred_id) # symbol, stock_pred_id,  
 
-    # print(retreive(stock_symbol_1))
+
 
 
 if __name__ == '__main__':
