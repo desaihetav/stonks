@@ -162,6 +162,8 @@ def main():
     # Next Day Price Predcition 
     newdf = df.filter(['Close'])
     # newdf['Predictions']
+    
+    # Leapfrog Future Prediction Algorithm
     for i in range(n):
         last_30_days = newdf[-30:].values
         last_30_days_scaled = scaler.transform(last_30_days)
