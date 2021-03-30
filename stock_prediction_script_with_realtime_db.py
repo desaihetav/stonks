@@ -40,10 +40,14 @@ def create_db(data_db):
 def add_new_data(future_pred, symbol, stock_pred_id):
     ''' Function to add a new row of prediction to specific 
     document_id of specific stock_symbol
+    
     '''
     ref = db.reference('stocks').child(symbol).child(stock_pred_id)
+    # ref = db.reference('/')
     # ref.set(data_db) #  .
-    ref.push(future_pred)
+    ref.set({
+        'close': future_pred
+        })
 
 def update(stock_symbol, stock_pred_id, field, updated_value):
     ''' Function to update specific value of specific field of 
@@ -199,14 +203,14 @@ def main():
                     {
                         stock_pred_id:
                         {
-                            'close': int(newdf2[0]),
+                            'close': int(newdf2[i]),
                         }
                     }
                 }
             }
             create_db(data_db)
         else:
-            add_new_data(int(newdf2[i]), symbol, stock_pred_id) # symbol, stock_pred_id,  
+            add_new_data(int(newdf2[i]), symbol, stock_pred_id) # symbol, stock_pred_id 
 
 
 
