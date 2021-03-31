@@ -33,19 +33,25 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': databaseURL
 })
 
-def create_db(data_db):
-    ref = db.reference('/')
-    ref.set(data_db)
-    
-def add_new_data(future_pred, symbol, stock_pred_id):
-    ''' Function to add a new row of prediction to specific 
-    document_id of specific stock_symbol
-    
+def create_db(data_db1):
+    ref = db.reference('stocks')
+    ref.update(data_db1)
+
+def create_db_branch(data_db2):
+    ''' Function that creates a new branch in the database everytime 
+        a new company's stocks are predicted
     '''
-    ref = db.reference('stocks').child(symbol).child(stock_pred_id)
+    ref = db.reference('stocks')
+    ref.set(data_db2)
+
+def add_new_data(future_pred, symbol, num):
+    ''' Function to add a new row of prediction to specific 
+        document_id of specific stock_symbol
+    '''
+    ref = db.reference('stocks').child(symbol).child('historical').child(num)
     # ref = db.reference('/')
     # ref.set(data_db) #  .
-    ref.set({
+    ref.update({
         'close': future_pred
         })
 
@@ -162,8 +168,9 @@ def main():
     # Next Day Price Predcition 
     newdf = df.filter(['Close'])
     # newdf['Predictions']
-    
-    # Leapfrog Future Prediction Algorithm
+
+
+    # Leapfrog 
     for i in range(n):
         last_30_days = newdf[-30:].values
         last_30_days_scaled = scaler.transform(last_30_days)
@@ -196,25 +203,26 @@ def main():
         next_date = last_date + timedelta(days = i)
         stock_pred_id = symbol + '_' + str(next_date.strftime('%d%m%Y'))   #'cipla_18032021' # (stock_symbol + _ + ddmmyy)
         print("stock_pred_id:", stock_pred_id)
-
-        if i == 0:
-            data_db = {
+        num = str(i)
+        data_db1 = {
             'stocks': 
                 {
                     symbol:
                     {
-                        stock_pred_id:
+                        'historical':
                         {
+                            num:
+                            {
                             'close': int(newdf2[i]),
+                            }
                         }
                     }
                 }
             }
-            create_db(data_db)
+        if i == 0:
+            create_db(data_db1)
         else:
-            add_new_data(int(newdf2[i]), symbol, stock_pred_id) # symbol, stock_pred_id 
-
-
+            add_new_data(int(newdf2[i]), symbol, num) # symbol, stock_pred_id
 
 
 if __name__ == '__main__':
