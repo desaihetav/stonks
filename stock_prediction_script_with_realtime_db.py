@@ -44,7 +44,7 @@ def create_db_branch(data_db2):
     ref = db.reference('stocks')
     ref.set(data_db2)
 
-def add_new_data(future_pred, symbol, num):
+def add_new_data(future_pred, symbol, num, date_of_pred, label):
     ''' Function to add a new row of prediction to specific 
         document_id of specific stock_symbol
     '''
@@ -52,7 +52,9 @@ def add_new_data(future_pred, symbol, num):
     # ref = db.reference('/')
     # ref.set(data_db) #  .
     ref.update({
-        'close': future_pred
+        'close': future_pred,
+        'date': date_of_pred,
+        'label': label
         })
 
 def update(stock_symbol, stock_pred_id, field, updated_value):
@@ -201,9 +203,13 @@ def main():
     for i in range(n):
         last_date = date.today()
         next_date = last_date + timedelta(days = i)
-        stock_pred_id = symbol + '_' + str(next_date.strftime('%d%m%Y'))   #'cipla_18032021' # (stock_symbol + _ + ddmmyy)
-        print("stock_pred_id:", stock_pred_id)
+        ''' stock_pred_id = symbol + '_' + str(next_date.strftime('%d%m%Y'))   #'cipla_18032021' # (stock_symbol + _ + ddmmyy)
+        print("stock_pred_id:", stock_pred_id) '''
         num = str(i)
+
+        date_of_pred = str(next_date.strftime('%Y-%m-%d'))
+        
+        label = next_date.strftime('%b %d, %Y')
         data_db1 = {
             'stocks': 
                 {
@@ -222,7 +228,7 @@ def main():
         '''if i == 0:
             create_db(data_db1)
         else:'''
-        add_new_data(int(newdf2[i]), symbol, num) # symbol, stock_pred_id
+        add_new_data(int(newdf2[i]), symbol, num, date_of_pred, label) # symbol, stock_pred_id
 
 
 if __name__ == '__main__':
