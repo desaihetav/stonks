@@ -219,10 +219,10 @@ def main():
                     }
                 }
             }
-        if i == 0:
+        '''if i == 0:
             create_db(data_db1)
-        else:
-            add_new_data(int(newdf2[i]), symbol, num) # symbol, stock_pred_id
+        else:'''
+        add_new_data(int(newdf2[i]), symbol, num) # symbol, stock_pred_id
 
 
 if __name__ == '__main__':
