@@ -27,7 +27,7 @@ from firebase_admin import db
 
 databaseURL = 'https://stonks-7b3ab-default-rtdb.firebaseio.com/'
 # Fetch the service account key JSON file 
-cred = credentials.Certificate('stonks-7b3ab-firebase-adminsdk-h2p7m-7106810010.json')
+cred = credentials.Certificate('Firebase Credential ID')
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
     'databaseURL': databaseURL
